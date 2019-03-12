@@ -44,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     AnimatorSet animatorSet = new AnimatorSet();
     MediaPlayer mp;
 
+    public final static boolean goingUp = true;
+    public final static boolean goingDown = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
         slidingWindow.add(acc);
-        if (slidingWindow.size() > 10){
+        if (slidingWindow.size() > 20){
             slidingWindow.remove(0);
             double newMax = Collections.max(slidingWindow);
             if (newMax > oldMax){
@@ -141,16 +144,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .ofFloat(button, View.TRANSLATION_Y, 0f, -screenHeight)
                 .setDuration(animationTime);
 
-
-        final Animator downAnimation = ObjectAnimator
-                .ofFloat(button, View.TRANSLATION_Y, -screenHeight, 0f)
-                .setDuration(animationTime);
-
         upAnimation.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
-                updateHeight(time, distance);
+                updateHeight(time, distance,goingUp);
             }
 
             @Override
@@ -161,6 +159,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
+        final Animator downAnimation = ObjectAnimator
+                .ofFloat(button, View.TRANSLATION_Y, -screenHeight, 0f)
+                .setDuration(animationTime);
+
+        downAnimation.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                updateHeight(time, distance,goingDown);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                heightTextView.setText("Height: " + format(0.0));
+            }
+        });
 
 
         animatorSet = new AnimatorSet();
@@ -172,14 +187,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         slidingWindow.clear();
         oldMax = threshold;
 
-
-
-        // resetSlidingWindowMax();
     }
 
     int updateFrequency = 0;
     int count = 0;
-    private void updateHeight(double time, double distance) {
+    private void updateHeight(double time, final double distance, boolean direction) {
         updateFrequency = 21;
 
         if(distance < 10) {
@@ -192,18 +204,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         final double distanceInterval = distance / updateFrequency;
         final double timeInterval = time / updateFrequency;
-
+        final boolean finalDirection = direction;
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 for ( int i = updateFrequency; i > 0; i--) {
-                    final int finalI = i;
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            heightTextView.setText("Height: " + format(distanceInterval* count++));
 
+                            String height;
+                            if (finalDirection) {
+                                height ="Height: " + format(distanceInterval* count++);
+                            } else {
+                                height ="Height: " + format( distance -(distanceInterval* count++));
+                            }
+                            heightTextView.setText(height);
                         }
                     });
 
@@ -213,16 +231,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         Log.d(TAG, "run: unable to sleep");
                         e.printStackTrace();
                     }
-
-
                 }
                 updateFrequency = 0;
                 count = 0;
             }
         }).start();
-
-
-
     }
 
     private void playSound() {
@@ -237,9 +250,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-
-
     }
 
     public void resetSlidingWindowMax(View view) {
@@ -252,15 +262,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         timeInAir.setText(" ");
         timeInAir.setText("Time: " + format(time));
         distanseTewxtview.setText("Distance: " + format(distance));
-
-
-
     }
-
-
-
-
-
 
 
     @Override
