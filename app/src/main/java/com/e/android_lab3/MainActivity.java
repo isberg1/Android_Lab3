@@ -18,6 +18,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -134,50 +136,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return;
         }
 
-        Button button = findViewById(R.id.tulleknapp);
+        final Button button = findViewById(R.id.tulleknapp);
 
-        float layoutHeight = animationSpace.getHeight();
+        final float layoutHeight = animationSpace.getHeight();
         float maxHeightMeter = (float) (distance/40);
-        float screenHeight = layoutHeight * maxHeightMeter;
+        float ballHeight = layoutHeight * maxHeightMeter;
         int animationTime = (int) (time * 1000);
 
-        final Animator upAnimation = ObjectAnimator
-                .ofFloat(button, View.TRANSLATION_Y, 0f, -screenHeight)
-                .setDuration(animationTime);
+        final int[] loc= {0,0};
+        button.getLocationOnScreen(loc);
+        final int startPosition = loc[1];
 
-        upAnimation.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                updateHeight(time, distance,goingUp);
-            }
 
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                playSound();
-                heightTextView.setText("Height: " + format(distance));
-            }
-        });
+        final Animator upAnimation = ObjectAnimator.ofFloat(button, View.TRANSLATION_Y, 0f, -ballHeight);
+        upAnimation.setDuration(animationTime);
+        upAnimation.setInterpolator(new DecelerateInterpolator( 1.5f));
 
-        final Animator downAnimation = ObjectAnimator
-                .ofFloat(button, View.TRANSLATION_Y, -screenHeight, 0f)
-                .setDuration(animationTime);
+        final Animator downAnimation = ObjectAnimator.ofFloat(button, View.TRANSLATION_Y, -ballHeight, 0f);
+        downAnimation.setDuration(animationTime);
+        downAnimation.setInterpolator(new AccelerateInterpolator(1.5f));
 
-        downAnimation.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                updateHeight(time, distance,goingDown);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                heightTextView.setText("Height: " + format(0.0));
-            }
-        });
-
+        upAnimationListeners(upAnimation, button, layoutHeight,time,startPosition);
+        downAnimationListeners(downAnimation, button, layoutHeight,time,startPosition);
 
         animatorSet = new AnimatorSet();
         animatorSet.playSequentially(
@@ -190,54 +170,77 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
-    int updateFrequency = 0;
-    int count = 0;
-    private void updateHeight(double time, final double distance, boolean direction) {
-        updateFrequency = 21;
+    private void downAnimationListeners(Animator downAnimation, final Button button, final float layoutHeight, final double time, final int startPosition) {
+        downAnimation.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                updateHeight(button, layoutHeight, time, startPosition);
+            }
 
-        if(distance < 10) {
-            updateFrequency = 12;
-        } else if (distance < 20) {
-            updateFrequency = 15;
-        } else if (distance < 30) {
-            updateFrequency = 18;
-        }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                heightTextView.setText("Height: " + format(0.0));
+            }
 
-        final double distanceInterval = distance / updateFrequency;
-        final double timeInterval = time / updateFrequency;
-        final boolean finalDirection = direction;
+        });
+    }
+
+    private void upAnimationListeners(Animator upAnimation, final Button button, final float layoutHeight, final double time, final int startPosition) {
+        upAnimation.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                updateHeight(button, layoutHeight, time, startPosition);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                playSound();
+                heightTextView.setText("Height: " + format(distance));
+            }
+        });
+    }
+
+    private void updateHeight(final View view, final float layoutHeight, final double time, final int startPosition ) {
+
+        final int updateFrequency = 20;
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                for ( int i = updateFrequency; i > 0; i--) {
+
+                final int sleepTime = (int) (((time / updateFrequency) * 1000));
+                
+                for (int i = 0; i < updateFrequency; i++) {
 
                     runOnUiThread(new Runnable() {
+
                         @Override
                         public void run() {
-
-                            String height;
-                            if (finalDirection) {
-                                height ="Height: " + format(distanceInterval* count++);
-                            } else {
-                                height ="Height: " + format( distance -(distanceInterval* count++));
-                            }
-                            heightTextView.setText(height);
+                           
+                            int[] locNow = {0, 0};
+                            view.getLocationOnScreen(locNow);
+                            final int endPosition = locNow[1];
+                            int heightOverZero =  startPosition - endPosition;
+                            double percentOfHeight = heightOverZero / layoutHeight;
+                            double height = percentOfHeight * 40;
+                            heightTextView.setText("Height: " + format(height));
                         }
                     });
 
                     try {
-                        Thread.sleep((long) (timeInterval * 1000));
+                        Thread.sleep(sleepTime );
                     } catch (InterruptedException e) {
-                        Log.d(TAG, "run: unable to sleep");
                         e.printStackTrace();
                     }
                 }
-                updateFrequency = 0;
-                count = 0;
             }
         }).start();
     }
+
 
     private void playSound() {
         try {
