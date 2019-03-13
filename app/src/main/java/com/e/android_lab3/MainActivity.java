@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
-
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
     private static final String TAG = "MainActivity";
 
@@ -36,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     SensorManager sensorManager;
     Sensor accelerometer;
     Button reset;
+    Toolbar toolbar;
 
     int threshold = 5;
     double g = 9.8;
@@ -46,16 +45,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     LinearLayout animationSpace;
     AnimatorSet animatorSet = new AnimatorSet();
     MediaPlayer mp;
-
-    public final static boolean goingUp = true;
-    public final static boolean goingDown = false;
+    Utilities util;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        util = new Utilities(getApplicationContext());
+
+        util.ensureValuesExist();
+
+        updateThreshold();
 
         accTextview = findViewById(R.id.acc);
 
@@ -71,21 +73,38 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(MainActivity.this, accelerometer,SensorManager.SENSOR_DELAY_GAME);
 
-
         mp = MediaPlayer.create(this, R.raw.ping);
-
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+       updateThreshold();
+    }
+
+    public void updateThreshold() {
+        try {
+            String key = getResources().getString(R.string.seekBar_key);
+            threshold = util.getPreference(key);
+            Log.d(TAG, "onCreate: threshold: " + threshold);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
 
         if (animatorSet.isRunning()) {
             reset.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+            toolbar.setBackgroundColor(getResources().getColor(R.color.colorAccent));
             return;
         }
         reset.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
         float xx = event.values[0];
         float yy = event.values[1];
@@ -96,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             acc = 0;
         }
 
-        accTextview.setText("Acceleration:  " + format(acc));
+        accTextview.setText("Acceleration:  " + util.format(acc));
 
 
         slidingWindow.add(acc);
@@ -105,29 +124,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             double newMax = Collections.max(slidingWindow);
             if (newMax > oldMax){
                 oldMax = newMax;
-                accSlidinWindow.setText("Sliding window max:" + format(oldMax));
+                accSlidinWindow.setText("Sliding window max:" + util.format(oldMax));
 
                 time = oldMax/g;
                 distance = 0.5 *g*time*time;
 
-                timeInAir.setText("Time: " + format(time));
-                distanseTewxtview.setText("Distance: " + format(distance));
+                timeInAir.setText("Time: " + util.format(time));
+                distanseTewxtview.setText("Distance: " + util.format(distance));
                 startAnimation(time, distance);
             }
 
         }
 
-    }
-
-    public String format(double num) {
-        String returnNum = null;
-        try {
-            returnNum = String.format("%.2f",num);
-        } catch (Exception e) {
-            Log.d(TAG, "format: unable to convert double to string");
-            e.printStackTrace();
-        }
-        return returnNum;
     }
 
     private void startAnimation(final double time, final double distance) {
@@ -181,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                heightTextView.setText("Height: " + format(0.0));
+                heightTextView.setText("Height: " + util.format(0.0));
             }
 
         });
@@ -199,14 +207,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 playSound();
-                heightTextView.setText("Height: " + format(distance));
+                heightTextView.setText("Height: " + util.format(distance));
             }
         });
     }
 
     private void updateHeight(final View view, final float layoutHeight, final double time, final int startPosition ) {
 
-        final int updateFrequency = 20;
+        final int updateFrequency = getResources().getInteger(R.integer.updateFrequency);
 
         new Thread(new Runnable() {
             @Override
@@ -227,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             int heightOverZero =  startPosition - endPosition;
                             double percentOfHeight = heightOverZero / layoutHeight;
                             double height = percentOfHeight * 40;
-                            heightTextView.setText("Height: " + format(height));
+                            heightTextView.setText("Height: " + util.format(height));
                         }
                     });
 
@@ -261,11 +269,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         time = 0;
         distance = 0;
 
-        accSlidinWindow.setText("Sliding window max:" + format(oldMax));
+        accSlidinWindow.setText("Sliding window max:" + util.format(oldMax));
         slidingWindow.clear();
         timeInAir.setText(" ");
-        timeInAir.setText("Time: " + format(time));
-        distanseTewxtview.setText("Distance: " + format(distance));
+        timeInAir.setText("Time: " + util.format(time));
+        distanseTewxtview.setText("Distance: " + util.format(distance));
     }
 
 

@@ -10,17 +10,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="wrap_content"
+                android:layout_height="40sp"
+                android:max="20"
+                android:layout_weight="1"
+                />
+
+            <TextView
+                android:id="@+id/seekBar_value"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text=" Test"
+                android:textSize="25sp"
+                android:layout_gravity="end"
+                android:layout_weight="0.2"
+                />
+
+
+
+        </TableRow>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
 
-        <SeekBar
-            android:id="@+id/seekBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:layout_editor_absoluteX="123dp"
-            tools:layout_editor_absoluteY="151dp" />
 
 
     </LinearLayout>
