@@ -10,9 +10,14 @@ import android.util.Log;
 public class Utilities {
     private static final String TAG = "Utilities";
     Context context;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor prefEditor;
 
     public Utilities(Context context) {
+
         this.context = context;
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences( this.context);
+        prefEditor = sharedPreferences.edit();
     }
 
     public String format(double num) {
@@ -27,48 +32,48 @@ public class Utilities {
     }
 
 
-    public int getPreferenceInt(String id) throws IllegalArgumentException {
+    public int getPreferenceInt(String id)  {
         int Default = 5;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!sharedPreferences.contains(id)) {
-           // throw new IllegalArgumentException("no key found");
-        }
+
         int value = sharedPreferences.getInt(id, Default);
         Log.d(TAG, "getPreferenceInt: value: " + value);
         return value;
     }
 
-    public float getPreferenceFloat(String id) throws IllegalArgumentException {
+    public float getPreferenceFloat(String id)  {
         float Default = 0.0f;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!sharedPreferences.contains(id)) {
-            // throw new IllegalArgumentException("no key found");
-        }
+
         float value = sharedPreferences.getFloat(id, Default);
         Log.d(TAG, "getPreferenceFloat: value: " + value);
+        return value;
+    }
+
+    public String getPreferenceString(String id) {
+        String Default ="";
+        String value = sharedPreferences.getString(id, Default);
+
         return value;
     }
 
 
 
     public void setPreference(String id, int value) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor prefEditor = sharedPreferences.edit();
         prefEditor.putInt(id, value);
         prefEditor.apply();
     }
 
     public void setPreference(String id, float value) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor prefEditor = sharedPreferences.edit();
         prefEditor.putFloat(id, value);
+        prefEditor.apply();
+    }
+
+    public void setPreference(String id, String value) {
+        prefEditor.putString(id, value);
         prefEditor.apply();
     }
 
 
     public void ensureValuesExist() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor prefEditor = sharedPreferences.edit();
 
         String seekBarKey = context.getResources().getString(R.string.seekBar_key);
         if (!sharedPreferences.contains(seekBarKey)) {
@@ -87,6 +92,12 @@ public class Utilities {
             prefEditor.putInt(slidingWindowKey, 20);
         }
 
+        String backgroundKey = context.getResources().getString(R.string.background_Key);
+
+        if (!sharedPreferences.contains(backgroundKey)) {
+           String[] background = context.getResources().getStringArray(R.array.array_background);
+           prefEditor.putString(backgroundKey, background[0]);
+        }
 
         prefEditor.apply();
     }

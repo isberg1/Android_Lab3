@@ -93,6 +93,22 @@
 
         </TableRow>
 
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <Spinner
+            android:id="@+id/background_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/array_background"
+            >
+
+        </Spinner>
+
+
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="50dp" />

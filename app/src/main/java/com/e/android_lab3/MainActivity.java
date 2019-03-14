@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         mp = MediaPlayer.create(this, R.raw.ping);
 
-
+        updateBackground();
 
     }
 
@@ -103,17 +103,38 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
        updateThreshold();
        updateHighscore();
        updateSlidingWindowSize();
+       updateBackground();
+    }
+
+    private void updateBackground() {
+        String backgroundKey = getResources().getString(R.string.background_Key);
+        String[] background = getResources().getStringArray(R.array.array_background);
+
+        String currentlySelected = util.getPreferenceString(backgroundKey);
+        Log.d(TAG, "updateBackground: background " + background[0]);
+        Log.d(TAG, "updateBackground: background " + background[1]);
+        Log.d(TAG, "updateBackground: background " + background[2]);
+        Log.d(TAG, "updateBackground: currentlySelected: " +currentlySelected);
+
+        if (currentlySelected.trim().equals(background[0].trim())) {
+            animationSpace.setBackground(getResources().getDrawable(R.drawable.italy));
+        } else if (currentlySelected.trim().equals(background[1].trim())) {
+            animationSpace.setBackground(getResources().getDrawable(R.drawable.nature));
+        }
+        else if (currentlySelected.trim().equals(background[2].trim())) {
+            animationSpace.setBackground(getResources().getDrawable(R.drawable.height));
+        } else  {
+            animationSpace.setBackground(getResources().getDrawable(R.drawable.nature));
+        }
+
     }
 
     public void updateThreshold() {
-        try {
-            String key = getResources().getString(R.string.seekBar_key);
-            threshold = util.getPreferenceInt(key);
-            Log.d(TAG, "onCreate: threshold: " + threshold);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+
+        String key = getResources().getString(R.string.seekBar_key);
+        threshold = util.getPreferenceInt(key);
+        Log.d(TAG, "onCreate: threshold: " + threshold);
+
     }
 
     @Override
@@ -136,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (acc < threshold) {
             acc = 0;
         }
-        
+
 
         slidingWindow.add(acc);
 
@@ -199,6 +220,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         animatorSet.start();
         slidingWindow.clear();
         oldMax = threshold;
+
+
 
     }
 
@@ -325,7 +348,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return super.onOptionsItemSelected(item);
     }
 }
-
 
 /*
 physics source: https://www.sausd.us/cms/lib5/ca01000471/centricity/moduleinstance/8024/physics_ii.pdf

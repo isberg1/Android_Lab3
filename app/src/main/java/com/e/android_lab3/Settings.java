@@ -4,8 +4,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class Settings extends AppCompatActivity {
@@ -14,10 +16,12 @@ public class Settings extends AppCompatActivity {
     SeekBar minAccSeekBar, slidingWindowSeekBar;
     TextView minAccSeekBarValue, slidingWindowSeekBarValue;
     Button resetHighscore;
+    Spinner background;
 
     Utilities util;
     String minAccSeekBarKey;
     String slidingWindowKey;
+    String backgroundKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +33,7 @@ public class Settings extends AppCompatActivity {
         resetHighscore = findViewById(R.id.reset_highscore_button);
         slidingWindowSeekBar = findViewById(R.id.sliding_window_seekBar);
         slidingWindowSeekBarValue = findViewById(R.id.sliding_window_value);
-
+        background =findViewById(R.id.background_spinner);
         util = new Utilities(getApplicationContext());
 
 
@@ -49,8 +53,42 @@ public class Settings extends AppCompatActivity {
         slidingWindowSeekBarValue.setText(Integer.toString(temp));
         slidingWindowSeekBarListener();
 
+        backgroundKey = getResources().getString(R.string.background_Key);
+        backgroundSetPosition();
+        backgroundSpinnerListener();
 
 
+    }
+
+    private void backgroundSetPosition() {
+        String current = util.getPreferenceString(backgroundKey);
+        String[] backgroundArray = getResources().getStringArray(R.array.array_background);
+
+        int counter =0;
+
+        for (String value : backgroundArray) {
+            if (current.equals(value)) {
+                background.setSelection(counter);
+                break;
+            }
+            counter++;
+        }
+
+    }
+
+    private void backgroundSpinnerListener() {
+        background.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String value = parent.getItemAtPosition(position).toString();
+                util.setPreference(backgroundKey, value);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void slidingWindowSeekBarListener() {

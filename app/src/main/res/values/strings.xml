@@ -5,11 +5,16 @@
     <string name="height_Score_Key">heightScore</string>
     <string name="debug_Mode_Key">debugMode</string>
     <string name="sliding_Window_Key">slidingWindow</string>
+    <string name="background_Key">background</string>
 
 
     <integer name="updateFrequency">20</integer>
     <integer name="threshold">10</integer>
 
-    seekBarValue
+    <string-array name="array_background">
+        <item>medieval church</item>
+        <item>nature</item>
+        <item>lines</item>
+    </string-array>
 
 </resources>
