@@ -98,15 +98,21 @@
             android:layout_width="match_parent"
             android:layout_height="20dp" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="   SELECT BACKGROUND"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+
         <Spinner
             android:id="@+id/background_spinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="35sp"
             android:entries="@array/array_background"
             >
 
         </Spinner>
-
 
 
         <Space

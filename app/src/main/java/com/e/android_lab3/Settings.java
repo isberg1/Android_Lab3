@@ -10,6 +10,14 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+/**
+ * @author alexander jakobsen(isberg1)
+ * sets and displys current settings for
+ * ACC_MIN
+ * slidingWindow size
+ * background image
+ * reset highscore
+ */
 public class Settings extends AppCompatActivity {
     private static final String TAG = "Settings";
 
@@ -28,29 +36,30 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        // find all views
         minAccSeekBar = findViewById(R.id.seekBar);
         minAccSeekBarValue = findViewById(R.id.seekBar_value);
         resetHighscore = findViewById(R.id.reset_highscore_button);
         slidingWindowSeekBar = findViewById(R.id.sliding_window_seekBar);
         slidingWindowSeekBarValue = findViewById(R.id.sliding_window_value);
         background =findViewById(R.id.background_spinner);
+        // initialize helper object
         util = new Utilities(getApplicationContext());
 
-
+   // get and set values for settings
         minAccSeekBarKey = getResources().getString(R.string.seekBar_key);
-        int getCurrentSeekBarValue;
-        getCurrentSeekBarValue = util.getPreferenceInt(minAccSeekBarKey);
-        minAccSeekBar.setProgress(getCurrentSeekBarValue);
-        minAccSeekBarValue.setText(Integer.toString(getCurrentSeekBarValue));
+        int getCurrentMinAccSeekBarValue;
+        getCurrentMinAccSeekBarValue = util.getPreferenceInt(minAccSeekBarKey);
+        minAccSeekBar.setProgress(getCurrentMinAccSeekBarValue);
+        minAccSeekBarValue.setText(Integer.toString(getCurrentMinAccSeekBarValue));
         minAccSeekBarListener();
 
-
         slidingWindowKey = getResources().getString(R.string.sliding_Window_Key);
-        int temp;
-        temp = util.getPreferenceInt(slidingWindowKey);
-        Log.d(TAG, "onCreate: temp value:" + temp);
-        slidingWindowSeekBar.setProgress(temp);
-        slidingWindowSeekBarValue.setText(Integer.toString(temp));
+        int getCurrentSlidingWindowSeekBarValue;
+        getCurrentSlidingWindowSeekBarValue = util.getPreferenceInt(slidingWindowKey);
+        Log.d(TAG, "onCreate: getCurrentSlidingWindowSeekBarValue value:" + getCurrentSlidingWindowSeekBarValue);
+        slidingWindowSeekBar.setProgress(getCurrentSlidingWindowSeekBarValue);
+        slidingWindowSeekBarValue.setText(Integer.toString(getCurrentSlidingWindowSeekBarValue));
         slidingWindowSeekBarListener();
 
         backgroundKey = getResources().getString(R.string.background_Key);
@@ -60,6 +69,9 @@ public class Settings extends AppCompatActivity {
 
     }
 
+    /**
+     * gets currently selected value of sets it to the top spinner position
+     */
     private void backgroundSetPosition() {
         String current = util.getPreferenceString(backgroundKey);
         String[] backgroundArray = getResources().getStringArray(R.array.array_background);
@@ -76,6 +88,10 @@ public class Settings extends AppCompatActivity {
 
     }
 
+    /**
+     * Listeners for spinner
+     * gets a value and writs it to preferences
+     */
     private void backgroundSpinnerListener() {
         background.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -91,6 +107,10 @@ public class Settings extends AppCompatActivity {
         });
     }
 
+    /**
+     * Listeners for slidingWindow size seekBar
+     * gets a value writs it to preferences and displays it on screen
+     */
     private void slidingWindowSeekBarListener() {
         slidingWindowSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -115,6 +135,10 @@ public class Settings extends AppCompatActivity {
         });
     }
 
+    /**
+     * Listeners for MIN_ACC value seekBar
+     * gets a value writs it to preferences and displays it on screen
+     */
     private void minAccSeekBarListener() {
         minAccSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -135,6 +159,11 @@ public class Settings extends AppCompatActivity {
         });
     }
 
+    /**
+     * OnClick listener for reset highscore button
+     * resets recorded highscore
+     * @param view == button
+     */
     public void resetHighscorButtonClick(View view) {
         String key = getResources().getString(R.string.height_Score_Key);
         util.setPreference(key,0.00f);

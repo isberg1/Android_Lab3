@@ -26,7 +26,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import android.os.Vibrator;
 
+/**
+ * @author alexander jakobsen(isberg1)
+ * apps lancher activity
+ */
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
     private static final String TAG = "MainActivity";
 
@@ -36,9 +41,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     Button reset;
     Toolbar toolbar;
 
+    Vibrator vibrator;
+
     int threshold = 5;
     double g = 9.8;
-    double oldMax;
     double time;
     double distance;
     int slidingWindowSize =20;
@@ -55,14 +61,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // helper object
         util = new Utilities(getApplicationContext());
-
+        // ensure som default values for settings exits
         util.ensureValuesExist();
-
+        // update minimum acceleration threshold
         updateThreshold();
 
+        // find all views in activity
         accTextview = findViewById(R.id.acc);
-
         accSlidinWindow = findViewById(R.id.acc_sliding_window);
         timeInAir= findViewById(R.id.time_in_air);
         animationSpace = findViewById(R.id.animation_space);
@@ -70,32 +78,52 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         heightTextView = findViewById(R.id.height_textView);
         highscore = findViewById(R.id.highscore);
 
+        // set values based on settings
         updateHighscore();
         updateSlidingWindowSize();
 
+        // vibration, mediaPlayer og sensor objects
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mp = MediaPlayer.create(this, R.raw.ping);
 
+        // configure sensor objects
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(MainActivity.this, accelerometer,SensorManager.SENSOR_DELAY_GAME);
 
-        mp = MediaPlayer.create(this, R.raw.ping);
-
+        // som values based on settings
         updateBackground();
 
     }
 
+    /**
+     * makes device vibrate
+     */
+    public void vibrate() {
+        vibrator.vibrate(250);
+    }
+
+    /**
+     * sets sliding slidingWindow size
+     */
     private void updateSlidingWindowSize() {
         String key = getResources().getString(R.string.sliding_Window_Key);
         int value = util.getPreferenceInt(key);
         slidingWindowSize = value;
     }
 
+    /**
+     * sets highscore value
+     */
     private void updateHighscore() {
         String highscoreKey = getResources().getString(R.string.height_Score_Key);
         float highscoreValue = util.getPreferenceFloat(highscoreKey);
         highscore.setText("Highscore: " + util.format(highscoreValue));
     }
 
+    /**
+     * updates values
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -106,15 +134,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
        updateBackground();
     }
 
+
+    /**
+     * sets the background image
+     */
     private void updateBackground() {
         String backgroundKey = getResources().getString(R.string.background_Key);
         String[] background = getResources().getStringArray(R.array.array_background);
 
         String currentlySelected = util.getPreferenceString(backgroundKey);
-        Log.d(TAG, "updateBackground: background " + background[0]);
-        Log.d(TAG, "updateBackground: background " + background[1]);
-        Log.d(TAG, "updateBackground: background " + background[2]);
-        Log.d(TAG, "updateBackground: currentlySelected: " +currentlySelected);
 
         if (currentlySelected.trim().equals(background[0].trim())) {
             animationSpace.setBackground(getResources().getDrawable(R.drawable.italy));
@@ -129,20 +157,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
+    /**
+     * sets minimum acceleration value
+     */
     public void updateThreshold() {
-
         String key = getResources().getString(R.string.seekBar_key);
         threshold = util.getPreferenceInt(key);
-        Log.d(TAG, "onCreate: threshold: " + threshold);
-
     }
 
+    /**
+     * gets sensor readings, calculates acceleration, time, distance and starts ball animation
+     * @param event sensor readings form acceleration meter
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
 
         if (animatorSet.isRunning()) {
-            reset.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-            toolbar.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+
             return;
         }
         reset.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
@@ -158,18 +189,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             acc = 0;
         }
 
-
         slidingWindow.add(acc);
-
 
         if (slidingWindow.size() > slidingWindowSize){
             slidingWindow.remove(0);
             double newMax = Collections.max(slidingWindow);
-            if (newMax > oldMax){
-                oldMax = newMax;
-                accSlidinWindow.setText("Sliding window max:" + util.format(oldMax));
+            if (newMax > threshold){
+                accSlidinWindow.setText("Sliding window max:" + util.format(newMax));
 
-                time = oldMax/g;
+                time = newMax/g;
                 distance = 0.5 *g*time*time;
 
                 timeInAir.setText("Time: " + util.format(time));
@@ -183,11 +211,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
+
+    /**
+     * Controls the ball animation
+     * @param time animation time (balls time in the air)
+     * @param distance animation distance ( balls height)
+     */
     private void startAnimation(final double time, final double distance) {
 
         if (animatorSet.isRunning()) {
             return;
         }
+
+        reset.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        toolbar.setBackgroundColor(getResources().getColor(R.color.colorAccent));
 
         final Button button = findViewById(R.id.tulleknapp);
 
@@ -219,12 +256,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         );
         animatorSet.start();
         slidingWindow.clear();
-        oldMax = threshold;
-
-
 
     }
 
+    /**
+     * listeners for the balls falling animation
+     * @param downAnimation animation object
+     * @param button == the ball
+     * @param layoutHeight height of background
+     * @param time time to fall
+     * @param startPosition animation start position on screen
+     */
     private void downAnimationListeners(Animator downAnimation, final Button button, final float layoutHeight, final double time, final int startPosition) {
         downAnimation.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -237,17 +279,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 heightTextView.setText("Height: " + util.format(0.0));
+                vibrate();
             }
 
         });
     }
 
+    /**
+     * listeners for the balls flying animation
+     * @param upAnimation animation object
+     * @param button == the ball
+     * @param layoutHeight height of background
+     * @param time time to fly up
+     * @param startPosition animation start position on screen
+     */
     private void upAnimationListeners(Animator upAnimation, final Button button, final float layoutHeight, final double time, final int startPosition) {
         upAnimation.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
                 updateHeight(button, layoutHeight, time, startPosition);
+                vibrate();
             }
 
             @Override
@@ -259,7 +311,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
     }
 
-
+    /**
+     *
+     * Realtime measurement of the balls height over its startposition
+     * @param view == the ball
+     * @param layoutHeight height of background
+     * @param time time between start and finish
+     * @param startPosition animation start position on screen
+     */
     private void updateHeight(final View view, final float layoutHeight, final double time, final int startPosition ) {
 
         final int updateFrequency = getResources().getInteger(R.integer.updateFrequency);
@@ -298,6 +357,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
+    /**
+     * plays a sound when called
+     */
     private void playSound() {
         try {
             if (mp.isPlaying()) {
@@ -308,16 +370,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         } catch(Exception e) { e.printStackTrace(); }
     }
 
+    /**
+     * unused
+     */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
+   // todo delete
     public void resetSlidingWindowMax(View view) {
-        oldMax = 0;
+
         time = 0;
         distance = 0;
-
-        accSlidinWindow.setText("Sliding window max:" + util.format(oldMax));
         slidingWindow.clear();
         timeInAir.setText(" ");
         timeInAir.setText("Time: " + util.format(time));
