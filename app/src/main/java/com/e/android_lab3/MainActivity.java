@@ -30,7 +30,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
     private static final String TAG = "MainActivity";
 
-    TextView heightTextView, accTextview, accSlidinWindow, timeInAir, distanseTewxtview;
+    TextView heightTextView, accTextview, accSlidinWindow, timeInAir,  highscore;
     SensorManager sensorManager;
     Sensor accelerometer;
     Button reset;
@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     double oldMax;
     double time;
     double distance;
+    int slidingWindowSize =20;
+
     List<Double> slidingWindow = new ArrayList<>();
     LinearLayout animationSpace;
     AnimatorSet animatorSet = new AnimatorSet();
@@ -63,10 +65,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         accSlidinWindow = findViewById(R.id.acc_sliding_window);
         timeInAir= findViewById(R.id.time_in_air);
-        distanseTewxtview = findViewById(R.id.distance);
         animationSpace = findViewById(R.id.animation_space);
         reset = findViewById(R.id.reset_button);
         heightTextView = findViewById(R.id.height_textView);
+        highscore = findViewById(R.id.highscore);
+
+        updateHighscore();
+        updateSlidingWindowSize();
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -75,6 +80,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         mp = MediaPlayer.create(this, R.raw.ping);
 
+
+
+    }
+
+    private void updateSlidingWindowSize() {
+        String key = getResources().getString(R.string.sliding_Window_Key);
+        int value = util.getPreferenceInt(key);
+        slidingWindowSize = value;
+    }
+
+    private void updateHighscore() {
+        String highscoreKey = getResources().getString(R.string.height_Score_Key);
+        float highscoreValue = util.getPreferenceFloat(highscoreKey);
+        highscore.setText("Highscore: " + util.format(highscoreValue));
     }
 
     @Override
@@ -82,12 +101,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
 
        updateThreshold();
+       updateHighscore();
+       updateSlidingWindowSize();
     }
 
     public void updateThreshold() {
         try {
             String key = getResources().getString(R.string.seekBar_key);
-            threshold = util.getPreference(key);
+            threshold = util.getPreferenceInt(key);
             Log.d(TAG, "onCreate: threshold: " + threshold);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -111,15 +132,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         float zz = event.values[2];
         double acc = Math.sqrt(xx*xx +yy*yy+zz*zz) - g;
 
+        accTextview.setText("Acceleration:  " + util.format(acc));
         if (acc < threshold) {
             acc = 0;
         }
-
-        accTextview.setText("Acceleration:  " + util.format(acc));
-
+        
 
         slidingWindow.add(acc);
-        if (slidingWindow.size() > 20){
+
+
+        if (slidingWindow.size() > slidingWindowSize){
             slidingWindow.remove(0);
             double newMax = Collections.max(slidingWindow);
             if (newMax > oldMax){
@@ -130,8 +152,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 distance = 0.5 *g*time*time;
 
                 timeInAir.setText("Time: " + util.format(time));
-                distanseTewxtview.setText("Distance: " + util.format(distance));
                 startAnimation(time, distance);
+                if (util.highscoreCheck(distance)) {
+                    highscore.setText("Highscore: " + util.format(distance));
+                }
             }
 
         }
@@ -212,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
     }
 
+
     private void updateHeight(final View view, final float layoutHeight, final double time, final int startPosition ) {
 
         final int updateFrequency = getResources().getInteger(R.integer.updateFrequency);
@@ -273,7 +298,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         slidingWindow.clear();
         timeInAir.setText(" ");
         timeInAir.setText("Time: " + util.format(time));
-        distanseTewxtview.setText("Distance: " + util.format(distance));
     }
 
 

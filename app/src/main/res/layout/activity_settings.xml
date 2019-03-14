@@ -10,9 +10,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="   MIN_ACC value"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+
 
         <TableRow
             android:layout_width="match_parent"
@@ -23,8 +31,9 @@
                 android:id="@+id/seekBar"
                 android:layout_width="wrap_content"
                 android:layout_height="40sp"
-                android:max="20"
+                android:max="30"
                 android:layout_weight="1"
+                android:progress="15"
                 />
 
             <TextView
@@ -45,7 +54,57 @@
             android:layout_width="match_parent"
             android:layout_height="20dp" />
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="   SLIDING_WINDOW SIZE"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
 
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <SeekBar
+                android:id="@+id/sliding_window_seekBar"
+                android:layout_width="wrap_content"
+                android:layout_height="40sp"
+                android:max="50"
+                android:layout_weight="1"
+                android:progress="10"
+                />
+
+            <TextView
+                android:id="@+id/sliding_window_value"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text=" Test"
+                android:textSize="25sp"
+                android:layout_gravity="end"
+                android:layout_weight="0.2"
+                />
+
+
+
+        </TableRow>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <Button
+            android:id="@+id/reset_highscore_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" RESET HIGHSCORE "
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:onClick="resetHighscorButtonClick"/>
 
     </LinearLayout>
 

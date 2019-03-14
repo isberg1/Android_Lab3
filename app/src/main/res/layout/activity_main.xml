@@ -52,7 +52,21 @@
 
     </LinearLayout>
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="4sp" />
 
+    <TextView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="Highscore: "
+        android:textSize="25dp"
+        android:id="@+id/highscore"/>
 
     <TextView
         android:paddingVertical="10dp"
@@ -97,7 +111,7 @@
 
 
 
-    <TextView
+   <!-- <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -106,7 +120,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:text="Distance: "
         android:textSize="15dp"
-        android:id="@+id/distance"/>
+        android:id="@+id/distance"/>-->
 
 
     <Space

@@ -2,7 +2,9 @@
     <string name="app_name">Android_Lab3</string>
     <string name="action_settings">Settings</string>
     <string name="seekBar_key">seekBarValue</string>
-
+    <string name="height_Score_Key">heightScore</string>
+    <string name="debug_Mode_Key">debugMode</string>
+    <string name="sliding_Window_Key">slidingWindow</string>
 
 
     <integer name="updateFrequency">20</integer>
