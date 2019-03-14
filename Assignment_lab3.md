@@ -1,33 +1,46 @@
-# Lab 03: Throwing a virtual ball upwords
+# Lab 03: Throwing a virtual ball upwards
 
 ## The idea
 
-Create an application that allows the user to throw a virtual (non existent) ball upwards. The app can consist of one main activity and one for Settings. The app should use accelerometer to detect a "throw event", which is an acceleration above certain sensitivity threshold. This "throw event" will initiate a following sequence of events:
+Create an application that allows the user to throw a virtual (non existent) ball upwards.
+The app can consist of one main activity and one for Settings.
+The app should use accelerometer to detect a "throw event",
+which is an acceleration above certain sensitivity threshold.
+This "throw event" will initiate a following sequence of events:
 
-   * the maximum acceleration will be used as the initial speed of the ball traveling upwards. Let's say, the top acceleration was equal to double the earth gravity (19.6m/s2).
+   * the maximum acceleration will be used as the initial speed of the ball traveling upwards.
+   Let's say, the top acceleration was equal to double the earth gravity (19.6m/s2).
    * we will assume that the ball is then traveling upwards with the speed 19.6m/s, and that the gravity is pulling it down (slowing it down) 9.8m/s2.
    * Roughly speaking, the ball, after 2s, should reach the highest point, and stop for a brief moment.
    * At that top moment, the phone should play a sound indicating that the ball reached the highest point.
    * After that, the ball should fall down exactly the same amount of time, as it was traveling upwards (yes, we are ignoring the air resistance).
-   * When the ball travels upwards, you should display a counter, showing, how many meters the ball has travelled up before reaching the "stop" point. This would be the "SCORE" for a given throw.
+   * When the ball travels upwards, you should display a counter, showing,
+   how many meters the ball has travelled up before reaching the "stop" point. This would be the "SCORE" for a given throw.
 
 The above should be recalculated for the actual top acceleration reached during the "throw" movement of the phone.
 
-To calculate the actual acceleration, you should use simple equation: `ACC = sqrt(x*x + y*y + z*z) - EarthGravity` where `x, y, z` are the acceleration readings from the accelerometer, and `EarthGravity` is the constant representing EarthGravity.  Therefore, a phone placed flat on a floor should provide you value of ACC close to 0.
+To calculate the actual acceleration,
+you should use simple equation: `ACC = sqrt(x*x + y*y + z*z) - EarthGravity` where `x, y, z` are the acceleration readings from the accelerometer,
+and `EarthGravity` is the constant representing EarthGravity.  Therefore, a phone placed flat on a floor should provide you value of ACC close to 0.
 
 
 ## Preferences
 
-The user should be able to specify in the preferences the sensitivity threshold (use slider) of what is the minimum value of acceleration ACC that would indicate a THROW event.  Anything below that MIN_ACC value will be ignored, and not considered as throw.
+The user should be able to specify in the preferences the sensitivity threshold (use slider)
+of what is the minimum value of acceleration ACC that would indicate a THROW event.
+Anything below that MIN_ACC value will be ignored, and not considered as throw.
 
 
 ## Extras
 
-To make the app more fun, you can play a sound with decreasing frequency on the ball movement UP, and a sound with increasing frequency on the way of the ball down.
+To make the app more fun, you can play a sound with decreasing frequency on the ball movement UP,
+and a sound with increasing frequency on the way of the ball down.
 
 You can also keep the "high score" list of the best "throws" of the ball (the highest distance reached).
 
-You can provide haptic feedback to the hand holding the phone, when the ball leaves the hand (the highest acceleration reached), and then, again, when the ball comes back down to the same location from where it has been thrown. This should feel as if the ball leaves the hand, and then comes back.
+You can provide haptic feedback to the hand holding the phone, when the ball leaves the hand (the highest acceleration reached),
+and then, again, when the ball comes back down to the same location from where it has been thrown.
+This should feel as if the ball leaves the hand, and then comes back.
 
 
 

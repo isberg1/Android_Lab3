@@ -312,8 +312,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     /**
-     *
      * Realtime measurement of the balls height over its startposition
+     * the height is calculated and displayed on the screen whenever the ball animation
+     * is playing
      * @param view == the ball
      * @param layoutHeight height of background
      * @param time time between start and finish
