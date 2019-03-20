@@ -1,5 +1,7 @@
 # Lab 03: Throwing a virtual ball upwards
 
+this app was made using a Samsung galaxy S5 with android 6.0.1
+
 ## using the app
 
 This app reads and calculates the mobile devices acceleration when moved rapidly, the values
