@@ -130,7 +130,7 @@ public class Utilities {
 
         String slidingWindowKey = context.getResources().getString(R.string.sliding_Window_Key);
         if (!sharedPreferences.contains(slidingWindowKey)) {
-            prefEditor.putInt(slidingWindowKey, 30);
+            prefEditor.putInt(slidingWindowKey, 20);
         }
 
         String backgroundKey = context.getResources().getString(R.string.background_Key);

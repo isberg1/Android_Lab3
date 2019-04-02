@@ -41,7 +41,7 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/tulleknapp"
+            android:id="@+id/ball"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"

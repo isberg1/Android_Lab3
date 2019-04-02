@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         double acc = Math.sqrt(xx*xx +yy*yy+zz*zz) - g;
 
         accTextview.setText(util.format(acc));
+        // everything bellow the threshold value is set to 0
         if (acc < threshold) {
             acc = 0;
         }
@@ -198,7 +199,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
          // if current size is lager then value set in settings
         if (slidingWindow.size() > slidingWindowSize){
             slidingWindow.remove(0);
-            double max = Collections.max(slidingWindow);
+
+            // in order to improve the overall experience
+            // found it to be better to use a selected average
+            // instated of just using the Collections(slidingWindow) max value.
+            double max = getSelectedAverage();
             if (max > threshold){
                 accSlidinWindow.setText(util.format(max));
 
@@ -217,6 +222,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
+    /**
+     * calculating the average of the best 3 provides the best gaming experience
+     * @return the average of the best 3
+     */
+    private double getSelectedAverage() {
+        Collections.sort(slidingWindow, Collections.<Double>reverseOrder());
+        double one = slidingWindow.get(0);
+        double two = slidingWindow.get(1);
+        double three = slidingWindow.get(2);
+        double average = (one + two + three ) / 3;
+
+        return average;
+    }
+
 
     /**
      * Controls the ball animation
@@ -224,42 +243,43 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param distance animation distance ( balls height)
      */
     private void startAnimation(final double time, final double distance) {
-
+        // cancel if animation is aalreadyrunning
         if (animatorSet.isRunning()) {
             return;
         }
-
-
+        // set toolbar color to indicate no more throw events will be registered
         toolbar.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-
-        final Button button = findViewById(R.id.tulleknapp);
+        final Button button = findViewById(R.id.ball);
         // make ball animation (height thrown) relative to screen size
         final float layoutHeight = animationSpace.getHeight();
         float maxHeightMeter = (float) (distance/40);
         float ballHeight = layoutHeight * maxHeightMeter;
         int animationTime = (int) (time * 1000);
 
+        // get current ball position
         final int[] loc= {0,0};
         button.getLocationOnScreen(loc);
         final int startPosition = loc[1];
 
-
+        // make down animation object
         final Animator upAnimation = ObjectAnimator.ofFloat(button, View.TRANSLATION_Y, 0f, -ballHeight);
         upAnimation.setDuration(animationTime);
         upAnimation.setInterpolator(new DecelerateInterpolator( 1.5f));
-
+        // make down animation object
         final Animator downAnimation = ObjectAnimator.ofFloat(button, View.TRANSLATION_Y, -ballHeight, 0f);
         downAnimation.setDuration(animationTime);
         downAnimation.setInterpolator(new AccelerateInterpolator(1.5f));
-
+        // animation event listeners
         upAnimationListeners(upAnimation, button, layoutHeight,time,startPosition);
         downAnimationListeners(downAnimation, button, layoutHeight,time,startPosition);
 
+        // set animation sequence
         animatorSet = new AnimatorSet();
         animatorSet.playSequentially(
                 upAnimation,
                 downAnimation
         );
+        // start animation
         animatorSet.start();
         slidingWindow.clear();
 
@@ -342,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                         @Override
                         public void run() {
-                           
+                           //   calculated and displayed the current ball height on the screen
                             int[] locNow = {0, 0};
                             view.getLocationOnScreen(locNow);
                             final int endPosition = locNow[1];
@@ -350,11 +370,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             double percentOfHeight = heightOverZero / layoutHeight;
                             double height = percentOfHeight * 40;
                             setHeight(height);
-                           //heightTextView.setText("Height: " + util.format(height));
                         }
                     });
 
                     try {
+                        // sleep until next update time
                         Thread.sleep(sleepTime );
                     } catch (InterruptedException e) {
                         e.printStackTrace();
