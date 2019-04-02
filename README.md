@@ -5,7 +5,7 @@ this app was made using a Samsung galaxy S5 with android 6.0.1
 ## using the app
 
 This app reads and calculates the mobile devices acceleration when moved rapidly, the values
-retrived are then used to throw a ball into the air. note that the height is based on
+retrieved are then used to throw a ball into the air. note that the height is based on
 max acceleration, not max force applied.
 
 The maximum height of the ball is recorded as a highscore.
@@ -32,6 +32,17 @@ i have added support for localization by making all strings displayed on screen 
 English(default) and Norwegian. in order to test this. you must first stop the app. then go to 
 android settings and change language to/from English or Norwegian. then you must restart the 
 app(changing language at runtime may at time cause weird things happen)
+
+
+Made allot of comments in javaDoc format. to test this open the 'Tools' tab. and click
+'Generate JaveDoc...'. select our output directory and click 'OK'. the JavaDoc HTML files
+can then be opened in a web browser. 
+
+
+the app provides haptic feedback(vibrates) in the person hand, 
+when the ball leaves the hand (the highest acceleration reached),
+and then, again, when the ball comes back down to the same location 
+from where it has been thrown.
 
 
 ## Technical implementation
