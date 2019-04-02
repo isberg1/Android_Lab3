@@ -26,12 +26,28 @@ in the top right corner you may go to the settings screen and change settings fo
 * RESET HIGHSCORE button resets the ball throw height highscore
 
 
+## Bonus Feature
+
+i have added support for localization by making all strings displayed on screen in
+English(default) and Norwegian. in order to test this. you must first stop the app. then go to 
+android settings and change language to/from English or Norwegian. then you must restart the 
+app(changing language at runtime may at time cause weird things happen)
+
+
 ## Technical implementation
 
+i have modularized as much as i can by placing anything nor UI related into a 
+separate 'Utilities' Class. 
+
+i made som tests in app/java/com.e.android_lab3(androidTest)/MainActivityTest
+
+
 In order to make the app I have made/modified the following files:
+(set the project structure in android studio to Android mode)
 * app/java/com.e.android_lab3/MainActivity
 * app/java/com.e.android_lab3/Settings
 * app/java/com.e.android_lab3/Utilities
+* app/java/com.e.android_lab3(androidTest)/MainActivityTest
 * app/res/drawable/ball.ping
 * app/res/drawable/ball.png
 * app/res/drawable/height.PNG

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android_Lab3</string>
+    <string name="action_settings">Instillinger</string>
+    <string name="highscore">Høyeste kast (M)</string>
+    <string name="time">Tid(Sec)</string>
+    <string name="acceleration">Akselerasjon:</string>
+    <string name="sliding_window_max">Sliding Window maksverdi:</string>
+    <string name="currenrt_height">Høyde: </string>
+    <string name="min_acc_value">MIN_ACC VERDI</string>
+    <string name="sliding_window_size">SLIDING_WINDOW STØRRELSE</string>
+    <string name="reset_highscore">RESET TOPPSCOREN</string>
+    <string name="select_background">VELG BAKGRUNNSBILDE</string>
+
+
+
+    <string-array name="array_background">
+        <item>middelalder kirke</item>
+        <item>natur</item>
+        <item>linjer</item>
+    </string-array>
+</resources>

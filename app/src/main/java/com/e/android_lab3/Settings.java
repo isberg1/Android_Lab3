@@ -36,24 +36,19 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // find all views
-        minAccSeekBar = findViewById(R.id.seekBar);
-        minAccSeekBarValue = findViewById(R.id.seekBar_value);
-        resetHighscore = findViewById(R.id.reset_highscore_button);
-        slidingWindowSeekBar = findViewById(R.id.sliding_window_seekBar);
-        slidingWindowSeekBarValue = findViewById(R.id.sliding_window_value);
-        background =findViewById(R.id.background_spinner);
+        findViews();
+
         // initialize helper object
         util = new Utilities(getApplicationContext());
 
-   // get and set values for settings
+        // get and set values for settings
         minAccSeekBarKey = getResources().getString(R.string.seekBar_key);
         int getCurrentMinAccSeekBarValue;
         getCurrentMinAccSeekBarValue = util.getPreferenceInt(minAccSeekBarKey);
         minAccSeekBar.setProgress(getCurrentMinAccSeekBarValue);
         minAccSeekBarValue.setText(Integer.toString(getCurrentMinAccSeekBarValue));
         minAccSeekBarListener();
-
+        // get and set values for settings
         slidingWindowKey = getResources().getString(R.string.sliding_Window_Key);
         int getCurrentSlidingWindowSeekBarValue;
         getCurrentSlidingWindowSeekBarValue = util.getPreferenceInt(slidingWindowKey);
@@ -61,12 +56,24 @@ public class Settings extends AppCompatActivity {
         slidingWindowSeekBar.setProgress(getCurrentSlidingWindowSeekBarValue);
         slidingWindowSeekBarValue.setText(Integer.toString(getCurrentSlidingWindowSeekBarValue));
         slidingWindowSeekBarListener();
-
+        // get and set values for settings
         backgroundKey = getResources().getString(R.string.background_Key);
         backgroundSetPosition();
         backgroundSpinnerListener();
 
 
+    }
+
+    /**
+     *   find all views
+     */
+    public void findViews() {
+        minAccSeekBar = findViewById(R.id.seekBar);
+        minAccSeekBarValue = findViewById(R.id.seekBar_value);
+        resetHighscore = findViewById(R.id.reset_highscore_button);
+        slidingWindowSeekBar = findViewById(R.id.sliding_window_seekBar);
+        slidingWindowSeekBarValue = findViewById(R.id.sliding_window_value);
+        background =findViewById(R.id.background_spinner);
     }
 
     /**

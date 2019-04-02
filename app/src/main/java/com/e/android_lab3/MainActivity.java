@@ -1,32 +1,33 @@
 package com.e.android_lab3;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.os.Vibrator;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import android.os.Vibrator;
 
 /**
  * @author alexander jakobsen(isberg1)
@@ -38,17 +39,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     TextView heightTextView, accTextview, accSlidinWindow, timeInAir,  highscore;
     SensorManager sensorManager;
     Sensor accelerometer;
-    Button reset;
     Toolbar toolbar;
-
     Vibrator vibrator;
 
-    int threshold = 5;
+    int threshold;
     double g = 9.8;
     double time;
     double distance;
     int slidingWindowSize =20;
-
+    String heightText;
     List<Double> slidingWindow = new ArrayList<>();
     LinearLayout animationSpace;
     AnimatorSet animatorSet = new AnimatorSet();
@@ -61,22 +60,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        threshold = 5;
         // helper object
         util = new Utilities(getApplicationContext());
         // ensure som default values for settings exits
         util.ensureValuesExist();
         // update minimum acceleration threshold
-        updateThreshold();
+       // updateThreshold();
+
+        heightText = getResources().getString(R.string.currenrt_height);
 
         // find all views in activity
-        accTextview = findViewById(R.id.acc);
-        accSlidinWindow = findViewById(R.id.acc_sliding_window);
-        timeInAir= findViewById(R.id.time_in_air);
+        accTextview = findViewById(R.id.acc_value);
+        accSlidinWindow = findViewById(R.id.sliding_window_value);
+        timeInAir= findViewById(R.id.time_in_air_value);
         animationSpace = findViewById(R.id.animation_space);
-        reset = findViewById(R.id.reset_button);
+
         heightTextView = findViewById(R.id.height_textView);
-        highscore = findViewById(R.id.highscore);
+        setHeight(0.00);
+        highscore = findViewById(R.id.highscore_height_value);
 
         // set values based on settings
         updateHighscore();
@@ -118,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private void updateHighscore() {
         String highscoreKey = getResources().getString(R.string.height_Score_Key);
         float highscoreValue = util.getPreferenceFloat(highscoreKey);
-        highscore.setText("Highscore: " + util.format(highscoreValue));
+        highscore.setText(util.format(highscoreValue));
     }
 
     /**
@@ -152,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         else if (currentlySelected.trim().equals(background[2].trim())) {
             animationSpace.setBackground(getResources().getDrawable(R.drawable.height));
         } else  {
-            animationSpace.setBackground(getResources().getDrawable(R.drawable.nature));
+            animationSpace.setBackground(getResources().getDrawable(R.drawable.italy));
         }
 
     }
@@ -161,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * sets minimum acceleration value
      */
     public void updateThreshold() {
+        Log.d(TAG, "updateThreshold: ");
         String key = getResources().getString(R.string.seekBar_key);
         threshold = util.getPreferenceInt(key);
     }
@@ -176,7 +179,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             return;
         }
-        reset.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+        Log.d(TAG, "onSensorChanged: threshold: " +  threshold);
+
         toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
         float xx = event.values[0];
@@ -184,26 +189,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         float zz = event.values[2];
         double acc = Math.sqrt(xx*xx +yy*yy+zz*zz) - g;
 
-        accTextview.setText("Acceleration:  " + util.format(acc));
+        accTextview.setText(util.format(acc));
         if (acc < threshold) {
             acc = 0;
         }
 
         slidingWindow.add(acc);
-
+         // if current size is lager then value set in settings
         if (slidingWindow.size() > slidingWindowSize){
             slidingWindow.remove(0);
-            double newMax = Collections.max(slidingWindow);
-            if (newMax > threshold){
-                accSlidinWindow.setText("Sliding window max:" + util.format(newMax));
+            double max = Collections.max(slidingWindow);
+            if (max > threshold){
+                accSlidinWindow.setText(util.format(max));
 
-                time = newMax/g;
+                time = max/g;
                 distance = 0.5 *g*time*time;
 
-                timeInAir.setText("Time: " + util.format(time));
+                timeInAir.setText(util.format(time *2));
                 startAnimation(time, distance);
+                // if new highscore
                 if (util.highscoreCheck(distance)) {
-                    highscore.setText("Highscore: " + util.format(distance));
+                    highscore.setText(util.format(distance));
                 }
             }
 
@@ -223,11 +229,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return;
         }
 
-        reset.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+
         toolbar.setBackgroundColor(getResources().getColor(R.color.colorAccent));
 
         final Button button = findViewById(R.id.tulleknapp);
-
+        // make ball animation (height thrown) relative to screen size
         final float layoutHeight = animationSpace.getHeight();
         float maxHeightMeter = (float) (distance/40);
         float ballHeight = layoutHeight * maxHeightMeter;
@@ -278,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                heightTextView.setText("Height: " + util.format(0.0));
+                setHeight(0.00);
                 vibrate();
             }
 
@@ -306,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 playSound();
-                heightTextView.setText("Height: " + util.format(distance));
+                setHeight(distance);
             }
         });
     }
@@ -343,7 +349,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             int heightOverZero =  startPosition - endPosition;
                             double percentOfHeight = heightOverZero / layoutHeight;
                             double height = percentOfHeight * 40;
-                            heightTextView.setText("Height: " + util.format(height));
+                            setHeight(height);
+                           //heightTextView.setText("Height: " + util.format(height));
                         }
                     });
 
@@ -378,17 +385,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-   // todo delete
-    public void resetSlidingWindowMax(View view) {
 
-        time = 0;
-        distance = 0;
-        slidingWindow.clear();
-        timeInAir.setText(" ");
-        timeInAir.setText("Time: " + util.format(time));
-    }
-
-
+    /**
+     * creates a option menue in the top right corner
+     * @param menu the view to be possessed
+     * @return true always
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -396,6 +398,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return true;
     }
 
+    /**
+     * handels clicking on entries in the menu
+     * @param item the specific object to be processed
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -412,6 +419,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    /**
+     * updates the current height in correct language and format
+     * @param num the height in Meter to be displayed
+     */
+    public void setHeight(double num) {
+        String text = heightText + " " + util.format(num);
+        heightTextView.setText(text);
+    }
+
 }
 
 /*

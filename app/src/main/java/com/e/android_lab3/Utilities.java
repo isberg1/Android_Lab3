@@ -120,7 +120,7 @@ public class Utilities {
 
         String minAccSeekBarKey = context.getResources().getString(R.string.seekBar_key);
         if (!sharedPreferences.contains(minAccSeekBarKey)) {
-            prefEditor.putInt(minAccSeekBarKey, 5);
+            prefEditor.putInt(minAccSeekBarKey, 7);
         }
 
         String heightScoreKey = context.getResources().getString(R.string.height_Score_Key);
@@ -130,7 +130,7 @@ public class Utilities {
 
         String slidingWindowKey = context.getResources().getString(R.string.sliding_Window_Key);
         if (!sharedPreferences.contains(slidingWindowKey)) {
-            prefEditor.putInt(slidingWindowKey, 20);
+            prefEditor.putInt(slidingWindowKey, 30);
         }
 
         String backgroundKey = context.getResources().getString(R.string.background_Key);
