@@ -3,7 +3,7 @@
     <string name="app_name">Android_Lab3</string>
     <string name="action_settings">Instillinger</string>
     <string name="highscore">Høyeste kast (M)</string>
-    <string name="time">Tid(Sec)</string>
+    <string name="time">Tid (Sec)</string>
     <string name="acceleration">Akselerasjon:</string>
     <string name="sliding_window_max">Sliding Window maksverdi:</string>
     <string name="currenrt_height">Høyde: </string>

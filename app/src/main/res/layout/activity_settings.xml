@@ -14,7 +14,9 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
+
         <TextView
+            android:id="@+id/min_acc_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/min_acc_value"
@@ -57,7 +59,9 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
+
         <TextView
+            android:id="@+id/sliding_window_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/sliding_window_size"
@@ -99,6 +103,7 @@
             android:layout_height="20dp" />
 
         <TextView
+            android:id="@+id/select_background_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/select_background"

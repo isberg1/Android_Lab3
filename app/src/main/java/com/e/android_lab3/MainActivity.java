@@ -28,6 +28,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author alexander jakobsen(isberg1)
@@ -36,23 +37,19 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
     private static final String TAG = "MainActivity";
 
-    TextView heightTextView, accTextview, accSlidinWindow, timeInAir,  highscore;
-    SensorManager sensorManager;
-    Sensor accelerometer;
-    Toolbar toolbar;
-    Vibrator vibrator;
+    private TextView heightTextView, accTextview, accSlidinWindow, timeInAir,  highscore;
+    private Toolbar toolbar;
+    private Vibrator vibrator;
 
-    int threshold;
-    double g = 9.8;
-    double time;
-    double distance;
-    int slidingWindowSize =20;
-    String heightText;
-    List<Double> slidingWindow = new ArrayList<>();
-    LinearLayout animationSpace;
-    AnimatorSet animatorSet = new AnimatorSet();
-    MediaPlayer mp;
-    Utilities util;
+    private int threshold;
+    private double distance;
+    private int slidingWindowSize =20;
+    private String heightText;
+    private List<Double> slidingWindow = new ArrayList<>();
+    private LinearLayout animationSpace;
+    private AnimatorSet animatorSet = new AnimatorSet();
+    private MediaPlayer mp;
+    private Utilities util;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         util = new Utilities(getApplicationContext());
         // ensure som default values for settings exits
         util.ensureValuesExist();
-        // update minimum acceleration threshold
-       // updateThreshold();
 
         heightText = getResources().getString(R.string.currenrt_height);
 
@@ -80,11 +75,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // vibration, mediaPlayer og sensor objects
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mp = MediaPlayer.create(this, R.raw.ping);
 
         // configure sensor objects
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(MainActivity.this, accelerometer,SensorManager.SENSOR_DELAY_GAME);
 
         // som values based on settings
@@ -92,8 +87,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
+    /**
+     * find all views in activity
+     */
     private void findAllViews() {
-        // find all views in activity
         accTextview = findViewById(R.id.acc_value);
         accSlidinWindow = findViewById(R.id.sliding_window_value);
         timeInAir= findViewById(R.id.time_in_air_value);
@@ -128,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     /**
-     * updates values
+     * updates UI and values
      */
     @Override
     protected void onResume() {
@@ -179,53 +176,63 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if (animatorSet.isRunning()) {
 
+        // if animation is running, don't process any more sensor events
+        if (animatorSet.isRunning()) {
             return;
         }
 
         Log.d(TAG, "onSensorChanged: threshold: " +  threshold);
-
+        // set toolbar color to default/OK green/blueish state
         toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
+        // the acceleration values for x,y and z axis
         float xx = event.values[0];
         float yy = event.values[1];
         float zz = event.values[2];
+        double g = 9.8;
         double acc = Math.sqrt(xx*xx +yy*yy+zz*zz) - g;
 
+        // display current acceleration calculation values in UI
         accTextview.setText(util.format(acc));
         // everything bellow the threshold value is set to 0
         if (acc < threshold) {
             acc = 0;
         }
 
-        // in order do prevent the ball form flying of screen on cellphones
+        // in order do prevent the ball form flying off screen on cellphones
         // with very sensitive acceleration meters, any value above 27 is set to 27.
         if (acc > 27) {
             acc = 27;
         }
 
-
-
         Log.d(TAG, "onSensorChanged: acc:" + acc);
-
+        // add the value to the list
         slidingWindow.add(acc);
          // if current size is lager then value set in settings
+         // or in other words if enough values have been recorded
         if (slidingWindow.size() > slidingWindowSize){
+            // remove the oldest entry
             slidingWindow.remove(0);
 
-            // in order to improve the overall experience
-            // found it to be better to use a selected average
-            // instated of just using the Collections(slidingWindow) max value.
+            // in order to improve the overall experience,
+            // I found it to be better to use a selected average
+            // instated of just using the max value in the slidingWindow list.
             double max = getSelectedAverage();
             if (max > threshold){
+
+                // update UI
                 accSlidinWindow.setText(util.format(max));
 
-                time = max/g;
-                distance = 0.5 *g*time*time;
+                // calculate ball distance in air
+                // physics source: https://www.sausd.us/cms/lib5/ca01000471/centricity/moduleinstance/8024/physics_ii.pdf
+                double time = max / g;
+                distance = 0.5 * g * time * time;
 
+                // update UI and start animation
                 timeInAir.setText(util.format(time *2));
                 startAnimation(time, distance);
+
                 // if new highscore, register it
                 if (util.highscoreCheck(distance)) {
                     highscore.setText(util.format(distance));
@@ -245,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         double one = slidingWindow.get(0);
         double two = slidingWindow.get(1);
         //double three = slidingWindow.get(2);
-        double average = (one + two  ) / 2;
+        double average = (one + two ) / 2;
 
         return average;
     }
@@ -257,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param distance animation distance ( balls height)
      */
     private void startAnimation(final double time, final double distance) {
-        // cancel if animation is aalreadyrunning
+        // cancel if animation is already running
         if (animatorSet.isRunning()) {
             return;
         }
@@ -293,9 +300,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 upAnimation,
                 downAnimation
         );
-        // start animation
+        // start animation and reset list for next throw event
         animatorSet.start();
         slidingWindow.clear();
+
+
+
 
     }
 
@@ -469,7 +479,3 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
 }
-
-/*
-physics source: https://www.sausd.us/cms/lib5/ca01000471/centricity/moduleinstance/8024/physics_ii.pdf
-*/
