@@ -50,12 +50,15 @@ the ability to change background image
 
 
 
-## Technical implementation
+## Other things
 
 i have modularized as much as i can by placing anything nor UI related into a 
 separate 'Utilities' Class. 
 
-i made som tests in app/java/com.e.android_lab3(androidTest)/MainActivityTest
+i made som tests in these locations.
+* app/java/com.e.android_lab3(androidTest)/MainActivityTest
+* app/java/com.e.android_lab3(androidTest)/SettingsTest
+* app/java/com.e.android_lab3(androidTest)/UtilitiesTest
 
 
 In order to make the app I have made/modified the following files:
@@ -64,7 +67,8 @@ In order to make the app I have made/modified the following files:
 * app/java/com.e.android_lab3/Settings
 * app/java/com.e.android_lab3/Utilities
 * app/java/com.e.android_lab3(androidTest)/MainActivityTest
-* app/res/drawable/ball.ping
+* app/java/com.e.android_lab3(androidTest)/SettingsTest
+* app/java/com.e.android_lab3(androidTest)/UtilitiesTest
 * app/res/drawable/ball.png
 * app/res/drawable/height.PNG
 * app/res/drawable/italy.jpg
@@ -73,7 +77,10 @@ In order to make the app I have made/modified the following files:
 * app/res/layout/activity_settings.xml
 * app/res/raw/ping.mp3
 * app/res/values/strings.xml
+* app/res/values/strings.xml(nb-rNO)
+* app/res/values/colors.xml
 * app/manifests/AndroidManifests.xml
+* Gradle Scripts/build-gradle(Module:app)
 
 
 

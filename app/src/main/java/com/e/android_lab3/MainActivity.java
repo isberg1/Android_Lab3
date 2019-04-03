@@ -175,8 +175,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      */
     @Override
     public void onSensorChanged(SensorEvent event) {
-
-
         // if animation is running, don't process any more sensor events
         if (animatorSet.isRunning()) {
             return;

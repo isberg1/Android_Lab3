@@ -21,15 +21,14 @@ import android.widget.TextView;
 public class Settings extends AppCompatActivity {
     private static final String TAG = "Settings";
 
-    SeekBar minAccSeekBar, slidingWindowSeekBar;
-    TextView minAccSeekBarValue, slidingWindowSeekBarValue;
-    Button resetHighscore;
-    Spinner background;
+    private SeekBar minAccSeekBar, slidingWindowSeekBar;
+    private TextView minAccSeekBarValue, slidingWindowSeekBarValue;
+    private Spinner background;
 
-    Utilities util;
-    String minAccSeekBarKey;
-    String slidingWindowKey;
-    String backgroundKey;
+    private Utilities util;
+    private String minAccSeekBarKey;
+    private String slidingWindowKey;
+    private String backgroundKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,19 +47,19 @@ public class Settings extends AppCompatActivity {
         minAccSeekBar.setProgress(getCurrentMinAccSeekBarValue);
         minAccSeekBarValue.setText(Integer.toString(getCurrentMinAccSeekBarValue));
         minAccSeekBarListener();
+
         // get and set values for settings
         slidingWindowKey = getResources().getString(R.string.sliding_Window_Key);
         int getCurrentSlidingWindowSeekBarValue;
         getCurrentSlidingWindowSeekBarValue = util.getPreferenceInt(slidingWindowKey);
-        Log.d(TAG, "onCreate: getCurrentSlidingWindowSeekBarValue value:" + getCurrentSlidingWindowSeekBarValue);
         slidingWindowSeekBar.setProgress(getCurrentSlidingWindowSeekBarValue);
         slidingWindowSeekBarValue.setText(Integer.toString(getCurrentSlidingWindowSeekBarValue));
         slidingWindowSeekBarListener();
+
         // get and set values for settings
         backgroundKey = getResources().getString(R.string.background_Key);
         backgroundSetPosition();
         backgroundSpinnerListener();
-
 
     }
 
@@ -70,7 +69,7 @@ public class Settings extends AppCompatActivity {
     public void findViews() {
         minAccSeekBar = findViewById(R.id.seekBar);
         minAccSeekBarValue = findViewById(R.id.seekBar_value);
-        resetHighscore = findViewById(R.id.reset_highscore_button);
+        Button resetHighscore = findViewById(R.id.reset_highscore_button);
         slidingWindowSeekBar = findViewById(R.id.sliding_window_seekBar);
         slidingWindowSeekBarValue = findViewById(R.id.sliding_window_value);
         background =findViewById(R.id.background_spinner);
@@ -123,6 +122,8 @@ public class Settings extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 util.setPreference(slidingWindowKey, progress);
+                // no value bellow 4 is accepted,
+                // in newer android versions, this can be done in XML
                 if (progress < 4) {
                     progress = 4;
                     slidingWindowSeekBar.setProgress(progress);

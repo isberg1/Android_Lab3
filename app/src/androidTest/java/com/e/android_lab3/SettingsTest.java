@@ -1,6 +1,10 @@
 package com.e.android_lab3;
 
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.ViewAction;
+import android.support.test.espresso.action.ViewActions;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.Before;
@@ -18,19 +22,18 @@ import static org.junit.Assert.*;
 
 public class SettingsTest {
 
-
     @Rule
     public ActivityTestRule<Settings> activityTestRule= new ActivityTestRule<Settings>(Settings.class);
 
 
     private String language;
     @Before
-    public void setUp() throws Exception {
+    public void setUp()  {
         // get system language
         language = Locale.getDefault().getLanguage();
     }
 
-    /*
+    /**
       tests if the right strings are being used for different languages
       for the textView: min_acc_textView
      */
@@ -41,7 +44,7 @@ public class SettingsTest {
         // find and check right view on screen
         Espresso.onView(withId(R.id.min_acc_textView)).check(matches(isDisplayed()));
 
-        // if language is Norwegian
+        // if language is Norwegian (bokmaal)
         if (language.equalsIgnoreCase("nb")) {
             String right = "MIN_ACC VERDI";
             String wrong = "MIN_ACC VALUE";
@@ -57,7 +60,7 @@ public class SettingsTest {
     }
 
 
-    /* *
+    /**
      * tests if the right strings are being used for different languages
      * for the textView: sliding_window_textView
      */
@@ -68,7 +71,7 @@ public class SettingsTest {
         // find and check right view on screen
         Espresso.onView(withId(R.id.sliding_window_textView)).check(matches(isDisplayed()));
 
-        // if language is Norwegian
+        // if language is Norwegian (bokmaal)
         if (language.equalsIgnoreCase("nb")) {
             String right = "SLIDING_WINDOW STØRRELSE";
             String wrong = "SLIDING_WINDOW SIZE";
@@ -85,8 +88,7 @@ public class SettingsTest {
 
 
 
-    /*
-     *//**
+   /**
      * tests if the right strings are being used for different languages
      * for the textView: select_background_textView
      */
@@ -97,7 +99,7 @@ public class SettingsTest {
         // find and check right view on screen
         Espresso.onView(withId(R.id.select_background_textView)).check(matches(isDisplayed()));
 
-        // if language is Norwegian
+        // if language is Norwegian (bokmaal)
         if (language.equalsIgnoreCase("nb")) {
             String right = "VELG BAKGRUNNSBILDE";
             String wrong = "SELECT BACKGROUND";
@@ -115,8 +117,7 @@ public class SettingsTest {
 
 
 
-    /*
-     *//**
+    /**
      * tests if the right strings are being used for different languages
      * for the button: reset_highscore_button
      */
@@ -127,7 +128,7 @@ public class SettingsTest {
         // find and check right view on screen
         Espresso.onView(withId(R.id.reset_highscore_button)).check(matches(isDisplayed()));
 
-        // if language is Norwegian
+        // if language is Norwegian (bokmaal)
         if (language.equalsIgnoreCase("nb")) {
             String right = "RESET TOPPSCOREN";
             String wrong = "RESET HIGHSCORE";
@@ -143,16 +144,22 @@ public class SettingsTest {
     }
 
 
-
-    @Test
-    public void onCreate() {
-    }
-
-    @Test
-    public void findViews() {
-    }
-
+    /**
+     * testes the resetHighscorButton
+     */
     @Test
     public void resetHighscorButtonClick() {
+        // Context of the app under test.
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        Utilities util = new Utilities(appContext);
+
+        // find and click the right view on screen
+        Espresso.onView(withId(R.id.reset_highscore_button)).perform(ViewActions.click());
+
+        String highScoreKey= "heightScore";
+        float expected = 0.00f;
+        float actual = util.getPreferenceFloat(highScoreKey);
+
+        assertEquals(expected,actual,0.00f);
     }
 }

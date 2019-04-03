@@ -31,7 +31,7 @@ public class MainActivityTest {
 
     private String language;
     @Before
-    public void setUp() throws Exception {
+    public void setUp()  {
         // get system language
         language = Locale.getDefault().getLanguage();
     }
@@ -47,7 +47,7 @@ public class MainActivityTest {
         // find and check right view on screen
         Espresso.onView(withId(R.id.time_in_air)).check( matches(isDisplayed()));
 
-        // if language is Norwegian
+        // if language is Norwegian (bokmaal)
         if (language.equalsIgnoreCase("nb")) {
             String right = "Tid (Sec)";
             String wrong = "Tie ";
@@ -73,7 +73,7 @@ public class MainActivityTest {
         // find and check right view on screen
         Espresso.onView(withId(R.id.highscore)).check(matches(isDisplayed()));
 
-        // if language is Norwegian
+        // if language is Norwegian (bokmaal)
         if (language.equalsIgnoreCase("nb")) {
             String right = "Høyeste kast (M)";
             String wrong = "Høyesteste kast (M)";
@@ -100,7 +100,7 @@ public class MainActivityTest {
         // find and check right view on screen
         Espresso.onView(withId(R.id.acc)).check(matches(isDisplayed()));
 
-        // if language is Norwegian
+        // if language is Norwegian (bokmaal)
         if (language.equalsIgnoreCase("nb")) {
             String right = "Akselerasjon:";
             String wrong = "Acceleration:";
@@ -128,7 +128,7 @@ public class MainActivityTest {
         // find and check right view on screen
         Espresso.onView(withId(R.id.acc_sliding_window)).check(matches(isDisplayed()));
 
-        // if language is Norwegian
+        // if language is Norwegian (bokmaal)
         if (language.equalsIgnoreCase("nb")) {
             String right = "Sliding Window maksverdi:";
             String wrong = "Sliding Window max:";
@@ -142,8 +142,5 @@ public class MainActivityTest {
             Espresso.onView(withId(R.id.acc_sliding_window)).check((matches(not(withText(wrong)))));
         }
     }
-
-
-
 
 }
