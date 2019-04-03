@@ -29,13 +29,14 @@ in the top right corner you may go to the settings screen and change settings fo
 ## Bonus Feature
 
 i have added support for localization by making all strings displayed on screen in
-English(default) and Norwegian. in order to test this. you must first stop the app. then go to 
+English(default) and Norwegian. in order to test this. you must first force stop the app. then go to 
 android settings and change language to/from English or Norwegian. then you must restart the 
 app(changing language at runtime may at time cause weird things happen)
 
 
-Made allot of comments in javaDoc format. to test this open the 'Tools' tab. and click
-'Generate JaveDoc...'. select our output directory and click 'OK'. the JavaDoc HTML files
+Made allot of comments in javaDoc format. to test this open the 'Tools' tab in Android Studio. 
+and click 'Generate JaveDoc...'. select our output directory, move the slider under to 
+'private' (top position) and click 'OK'. the JavaDoc HTML files
 can then be opened in a web browser. 
 
 
@@ -43,6 +44,10 @@ the app provides haptic feedback(vibrates) in the person hand,
 when the ball leaves the hand (the highest acceleration reached),
 and then, again, when the ball comes back down to the same location 
 from where it has been thrown.
+
+
+the ability to change background image
+
 
 
 ## Technical implementation

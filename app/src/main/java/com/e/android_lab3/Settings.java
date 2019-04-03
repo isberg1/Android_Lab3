@@ -123,8 +123,8 @@ public class Settings extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 util.setPreference(slidingWindowKey, progress);
-                if (progress < 1) {
-                    progress =1;
+                if (progress < 4) {
+                    progress = 4;
                     slidingWindowSeekBar.setProgress(progress);
                 }
                 slidingWindowSeekBarValue.setText(Integer.toString(progress));

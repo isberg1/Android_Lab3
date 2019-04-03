@@ -70,15 +70,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         heightText = getResources().getString(R.string.currenrt_height);
 
-        // find all views in activity
-        accTextview = findViewById(R.id.acc_value);
-        accSlidinWindow = findViewById(R.id.sliding_window_value);
-        timeInAir= findViewById(R.id.time_in_air_value);
-        animationSpace = findViewById(R.id.animation_space);
-
-        heightTextView = findViewById(R.id.height_textView);
+        findAllViews();
+        // set ball starting height
         setHeight(0.00);
-        highscore = findViewById(R.id.highscore_height_value);
 
         // set values based on settings
         updateHighscore();
@@ -96,6 +90,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // som values based on settings
         updateBackground();
 
+    }
+
+    private void findAllViews() {
+        // find all views in activity
+        accTextview = findViewById(R.id.acc_value);
+        accSlidinWindow = findViewById(R.id.sliding_window_value);
+        timeInAir= findViewById(R.id.time_in_air_value);
+        animationSpace = findViewById(R.id.animation_space);
+        heightTextView = findViewById(R.id.height_textView);
+        highscore = findViewById(R.id.highscore_height_value);
     }
 
     /**
@@ -195,6 +199,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             acc = 0;
         }
 
+        // in order do prevent the ball form flying of screen on cellphones
+        // with very sensitive acceleration meters, any value above 27 is set to 27.
+        if (acc > 27) {
+            acc = 27;
+        }
+
+
+
+        Log.d(TAG, "onSensorChanged: acc:" + acc);
+
         slidingWindow.add(acc);
          // if current size is lager then value set in settings
         if (slidingWindow.size() > slidingWindowSize){
@@ -212,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                 timeInAir.setText(util.format(time *2));
                 startAnimation(time, distance);
-                // if new highscore
+                // if new highscore, register it
                 if (util.highscoreCheck(distance)) {
                     highscore.setText(util.format(distance));
                 }
@@ -230,8 +244,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Collections.sort(slidingWindow, Collections.<Double>reverseOrder());
         double one = slidingWindow.get(0);
         double two = slidingWindow.get(1);
-        double three = slidingWindow.get(2);
-        double average = (one + two + three ) / 3;
+        //double three = slidingWindow.get(2);
+        double average = (one + two  ) / 2;
 
         return average;
     }
@@ -298,12 +312,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                // update UI
                 updateHeight(button, layoutHeight, time, startPosition);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
+                // update UI and vibrate the phone
                 setHeight(0.00);
                 vibrate();
             }
@@ -324,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                // update UI and vibrate the phone when ball is at the bottom
                 updateHeight(button, layoutHeight, time, startPosition);
                 vibrate();
             }
@@ -331,6 +348,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
+                // play sound at ball max height and update UI
                 playSound();
                 setHeight(distance);
             }
@@ -347,22 +365,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param startPosition animation start position on screen
      */
     private void updateHeight(final View view, final float layoutHeight, final double time, final int startPosition ) {
-
+        // numbered of times the 'current height meter' next to the ball is updated
         final int updateFrequency = getResources().getInteger(R.integer.updateFrequency);
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-
+                // calculate the time between UI updates
                 final int sleepTime = (int) (((time / updateFrequency) * 1000));
-                
+                // one iteration of the loop does one UI update
                 for (int i = 0; i < updateFrequency; i++) {
-
+                    // UI updates can only be done in UI thread
                     runOnUiThread(new Runnable() {
 
                         @Override
                         public void run() {
-                           //   calculated and displayed the current ball height on the screen
+                           // calculated and displayed the current ball height on the screen
                             int[] locNow = {0, 0};
                             view.getLocationOnScreen(locNow);
                             final int endPosition = locNow[1];
